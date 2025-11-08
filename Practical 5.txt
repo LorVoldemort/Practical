@@ -1,0 +1,55 @@
+
+create table Stud_Marks(rollno number(20),name varchar2(20),total_marks number(20))
+ create table Fine(roll_no number(20),due_date date,amt number(20))
+
+CREATE OR REPLACE PROCEDURE proc_Grade (
+    p_Roll Stud_Marks.Rollno%TYPE
+)
+AS
+    v_Name  Stud_Marks.Name%TYPE;
+    v_Marks Stud_Marks.Total_Marks%TYPE;
+    v_Class VARCHAR2(30);
+BEGIN
+    -- Fetch student's name and marks
+    SELECT Name, Total_Marks
+    INTO v_Name, v_Marks
+    FROM Stud_Marks
+    WHERE Rollno = p_Roll;
+
+    -- Categorization logic
+    IF v_Marks BETWEEN 990 AND 1500 THEN
+        v_Class := 'Distinction';
+    ELSIF v_Marks BETWEEN 900 AND 989 THEN
+        v_Class := 'First Class';
+    ELSIF v_Marks BETWEEN 825 AND 899 THEN
+        v_Class := 'Higher Second Class';
+    ELSE
+        v_Class := 'Fail';
+    END IF;
+
+    -- Insert into Result table
+    INSERT INTO Result (Rollno, Name, Class)
+    VALUES (p_Roll, v_Name, v_Class);
+
+    DBMS_OUTPUT.PUT_LINE('Result added for ' || v_Name || ': ' || v_Class);
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE(' No record found for Roll No: ' || p_Roll);
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Unexpected error: ' || SQLERRM);
+END;
+/
+
+
+
+//for Output
+
+BEGIN
+    proc_Grade(101);
+    proc_Grade(102);
+    proc_Grade(103);
+    proc_Grade(104);
+END;
+/
+

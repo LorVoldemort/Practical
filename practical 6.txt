@@ -1,0 +1,90 @@
+DECLARE
+	CURSOR c_merge(p_rollno O_RollCall.RollNo%TYPE) IS
+		SELECT RollNo, Name, Status
+		FROM N_RollCall
+		WHERE RollNo = p_rollno;
+
+	v_rollno N_RollCall.RollNo%TYPE;
+	v_name   N_RollCall.Name%TYPE;
+	v_status N_RollCall.Status%TYPE;
+
+BEGIN
+	FOR rec IN (SELECT RollNo, Name, Status FROM N_RollCall) LOOP
+		
+		OPEN c_merge(rec.RollNo);
+		FETCH c_merg INTO v_rollno, v_name, v_status;
+
+		IF c_merge%NOTFOUND THEN
+			INSERT INTO O_RollCall (RollNo, Name, Status);
+			VALUES (rec.RollNo, rec.Name, rec.Status);
+		END IF;
+
+		CLOSE c_merge;
+	END LOOP;
+
+	DBMS_OUTPUT.PUT_LINE("Merge completed Succeessfully.");
+END;
+/
+
+
+
+
+
+CREATE TABLE Library (
+    Book_ID      NUMBER(5) PRIMARY KEY,
+    Book_Name    VARCHAR2(100),
+    Author_Name  VARCHAR2(50),
+    Price        NUMBER(8,2)
+);
+
+
+CREATE TABLE Library_Audit (
+    Audit_ID     NUMBER(5) PRIMARY KEY,
+    Book_ID      NUMBER(5),
+    Book_Name    VARCHAR2(100),
+    Author_Name  VARCHAR2(50),
+    Price        NUMBER(8,2),
+    Operation    VARCHAR2(10),      
+    Operation_By VARCHAR2(30),    
+    Operation_On DATE DEFAULT SYSDATE
+);
+
+
+
+INSERT INTO Library VALUES (1, 'DBMS Concepts', 'Korth', 550);
+INSERT INTO Library VALUES (2, 'Let Us C', 'Yashwant Kanetkar', 300);
+INSERT INTO Library VALUES (3, 'Artificial Intelligence', 'Russell', 700);
+
+
+CREATE SEQUENCE seq_audit_id
+START WITH 1
+INCREMENT BY 1;
+
+
+CREATE OR REPLACE TRIGGER trg_Library_Audit
+AFTER UPDATE OR DELETE
+ON Library
+FOR EACH ROW
+BEGIN
+    IF UPDATING THEN
+        INSERT INTO Library_Audit (Audit_ID, Book_ID, Book_Name, Author_Name, Price, Operation, Operation_By)
+        VALUES (seq_audit_id.NEXTVAL, :OLD.Book_ID, :OLD.Book_Name, :OLD.Author_Name, :OLD.Price, 'UPDATE', USER);
+    ELSIF DELETING THEN
+        INSERT INTO Library_Audit (Audit_ID, Book_ID, Book_Name, Author_Name, Price, Operation, Operation_By)
+        VALUES (seq_audit_id.NEXTVAL, :OLD.Book_ID, :OLD.Book_Name, :OLD.Author_Name, :OLD.Price, 'DELETE', USER);
+    END IF;
+END;
+/
+
+
+//for output
+
+UPDATE Library
+SET Price = 600
+WHERE Book_ID = 1;
+
+DELETE FROM Library
+WHERE Book_ID = 2;
+
+
+

@@ -1,0 +1,66 @@
+CREATE DATABASE CollegeLibrary;
+USE CollegeLibrary;
+
+
+CREATE TABLE Student (
+    StudentID INT PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL,
+    Department VARCHAR(30),
+    Year INT CHECK (Year BETWEEN 1 AND 4),
+    Email VARCHAR(50) UNIQUE
+);
+
+
+
+CREATE TABLE Book (
+    BookID INT PRIMARY KEY,
+    Title VARCHAR(100) NOT NULL,
+    Author VARCHAR(50),
+    Publisher VARCHAR(50),
+    Price DECIMAL(8,2) CHECK (Price > 0),
+    Availability CHAR(1) DEFAULT 'Y'  -- Y = Available, N = Not Available
+);
+
+
+
+CREATE TABLE Transaction (
+    TransID INT PRIMARY KEY auto_increment,
+    StudentID INT,
+    BookID INT,
+    IssueDate DATE NOT NULL,
+    ReturnDate DATE,
+    Status VARCHAR(10) CHECK (Status IN ('Issued', 'Returned')),
+    FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
+    FOREIGN KEY (BookID) REFERENCES Book(BookID)
+);
+
+
+
+CREATE VIEW Issued_Books AS
+SELECT S.Name AS StudentName, B.Title AS BookTitle, T.IssueDate, T.Status
+FROM Transaction T
+JOIN Student S ON T.StudentID = S.StudentID
+JOIN Book B ON T.BookID = B.BookID
+WHERE T.Status = 'Issued';
+
+CREATE INDEX idx_book_title ON Book (Title);
+
+
+
+INSERT INTO Student VALUES (101, 'Amit Sharma', 'Computer', 3, 'amit@gmail.com');
+INSERT INTO Student VALUES (102, 'Sneha Patil', 'IT', 2, 'sneha@gmail.com');
+
+INSERT INTO Book VALUES (1001, ‘DBMS’, 'Elmasri', 'Pearson', 550.00, 'Y');
+INSERT INTO Book VALUES (1002, 'Operating Systems', 'Silberschatz', 'Wiley', 620.00, 'Y');
+
+
+INSERT INTO Transaction (StudentID, BookID, IssueDate, ReturnDate, Status)
+VALUES
+(101, 1001, '2025-10-01', NULL, 'Issued'),
+(102, 1002, '2025-09-25', '2025-10-05', 'Returned'),
+(103, 1003, '2025-09-30', NULL, 'Issued'),
+(104, 1004, '2025-09-15', '2025-09-28', 'Returned');
+
+
+SELECT * FROM Issued_Books;
+
