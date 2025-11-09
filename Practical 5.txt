@@ -1,9 +1,10 @@
 
 create table Stud_Marks(rollno number(20),name varchar2(20),total_marks number(20))
- create table Fine(roll_no number(20),due_date date,amt number(20))
+
+ create table Result(roll_no number(20),name varchar2(20),class varchar2(20));
 
 CREATE OR REPLACE PROCEDURE proc_Grade (
-    p_Roll Stud_Marks.Rollno%TYPE
+    p_Roll Stud_Marks.Roll_no%TYPE
 )
 AS
     v_Name  Stud_Marks.Name%TYPE;
@@ -14,7 +15,7 @@ BEGIN
     SELECT Name, Total_Marks
     INTO v_Name, v_Marks
     FROM Stud_Marks
-    WHERE Rollno = p_Roll;
+    WHERE Roll_no = p_Roll;
 
     -- Categorization logic
     IF v_Marks BETWEEN 990 AND 1500 THEN

@@ -18,7 +18,7 @@ CREATE TABLE Book (
     Author VARCHAR(50),
     Publisher VARCHAR(50),
     Price DECIMAL(8,2) CHECK (Price > 0),
-    Availability CHAR(1) DEFAULT 'Y'  -- Y = Available, N = Not Available
+    Availability CHAR(1) DEFAULT 'Y'
 );
 
 
