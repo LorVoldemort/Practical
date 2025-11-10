@@ -89,7 +89,7 @@ FROM Employee
 WHERE Salary > (SELECT AVG(Salary) FROM Employee);
 
 
-Query 6 — SUBQUERY with IN (Find employees with performance rating above average)
+Query 6 — SUBQUERY with IN (Find employees with performance rating above average)s
 
 SELECT EmpName
 FROM Employee

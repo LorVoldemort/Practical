@@ -1,30 +1,55 @@
-DECLARE
-	CURSOR c_merge(p_rollno O_RollCall.RollNo%TYPE) IS
-		SELECT RollNo, Name, Status
-		FROM N_RollCall
-		WHERE RollNo = p_rollno;
+create table info
+(
+	rollno number ,
+	name varchar2(30),
+	branch varchar2(30)
+);
 
-	v_rollno N_RollCall.RollNo%TYPE;
-	v_name   N_RollCall.Name%TYPE;
-	v_status N_RollCall.Status%TYPE;
+create table info1
+(
+	rollno number ,
+	name varchar2(30),
+	branch varchar2(30)
+);
 
-BEGIN
-	FOR rec IN (SELECT RollNo, Name, Status FROM N_RollCall) LOOP
-		
-		OPEN c_merge(rec.RollNo);
-		FETCH c_merg INTO v_rollno, v_name, v_status;
+insert into info values (1, 'abhinav', 'computer');
+insert into info values (2, 'raj', 'mech');
+insert into info values (3, 'sai', 'prod');
+insert into info values (4, 'pravin', 'it');
 
-		IF c_merge%NOTFOUND THEN
-			INSERT INTO O_RollCall (RollNo, Name, Status);
-			VALUES (rec.RollNo, rec.Name, rec.Status);
-		END IF;
+insert into info1 values (5, 'rahul', 'it');
+insert into info1 values (2, 'raj', 'mech');
+insert into info1 values (6, 'ramesh', 'prod');
+insert into info1 values (7, 'mahesh', 'civil');
 
-		CLOSE c_merge;
-	END LOOP;
+declare
+	rn info.rollno%type;
+	nm info.name%type;
+	br info.branch%type;
+	
+	cursor c_info is
 
-	DBMS_OUTPUT.PUT_LINE("Merge completed Succeessfully.");
-END;
+		select * from info 
+		minus
+		select * from info1;
+begin
+	open c_info;
+
+	loop
+
+		fetch c_info into rn,nm,br;
+		exit when c_info%notfound;
+
+		insert into info1 values(rn,nm,br);
+		dbms_output.put_line(rn ||' '|| nm||' '||br||' ');
+	end loop;
+
+	close c_info;
+end;
 /
+	
+
+	
 
 
 
@@ -68,10 +93,10 @@ FOR EACH ROW
 BEGIN
     IF UPDATING THEN
         INSERT INTO Library_Audit (Audit_ID, Book_ID, Book_Name, Author_Name, Price, Operation, Operation_By)
-        VALUES (seq_audit_id.NEXTVAL, :OLD.Book_ID, :OLD.Book_Name, :OLD.Author_Name, :OLD.Price, 'UPDATE', USER);
+        VALUES (seq_audit_id.NEXTVAL, :OLD.Book_ID, :OLD.Book_Name, :OLD.Author_Name, :OLD.Price, 'UPDATE', 'USER');
     ELSIF DELETING THEN
         INSERT INTO Library_Audit (Audit_ID, Book_ID, Book_Name, Author_Name, Price, Operation, Operation_By)
-        VALUES (seq_audit_id.NEXTVAL, :OLD.Book_ID, :OLD.Book_Name, :OLD.Author_Name, :OLD.Price, 'DELETE', USER);
+        VALUES (seq_audit_id.NEXTVAL, :OLD.Book_ID, :OLD.Book_Name, :OLD.Author_Name, :OLD.Price, 'DELETE', 'USER');
     END IF;
 END;
 /

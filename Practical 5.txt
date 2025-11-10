@@ -1,7 +1,13 @@
 
 create table Stud_Marks(rollno number(20),name varchar2(20),total_marks number(20))
 
- create table Result(roll_no number(20),name varchar2(20),class varchar2(20));
+
+INSERT INTO Stud_Marks VALUES (1, 'Amit', 1200);
+INSERT INTO Stud_Marks VALUES (2, 'Neha', 950);
+INSERT INTO Stud_Marks VALUES (3, 'Ravi', 870);
+INSERT INTO Stud_Marks VALUES (4, 'Priya', 700);
+
+create table Result(Rollno number(20),Name varchar2(20),Class varchar2(20));
 
 CREATE OR REPLACE PROCEDURE proc_Grade (
     p_Roll Stud_Marks.Roll_no%TYPE
@@ -28,7 +34,6 @@ BEGIN
         v_Class := 'Fail';
     END IF;
 
-    -- Insert into Result table
     INSERT INTO Result (Rollno, Name, Class)
     VALUES (p_Roll, v_Name, v_Class);
 
@@ -46,11 +51,12 @@ END;
 
 //for Output
 
+
 BEGIN
-    proc_Grade(101);
-    proc_Grade(102);
-    proc_Grade(103);
-    proc_Grade(104);
+    proc_Grade(1);
+    proc_Grade(2);
+    proc_Grade(3);
+    proc_Grade(4);
 END;
 /
 
